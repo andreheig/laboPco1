@@ -2,7 +2,7 @@
 #define REQUESTDISPATCHERTHREAD_H
 #include <QThread>
 #include <QDebug>
-#include "abstractbuffer.h".h"
+#include "abstractbuffer.h"
 #include "request.h"
 
 
