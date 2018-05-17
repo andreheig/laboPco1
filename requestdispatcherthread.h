@@ -4,13 +4,14 @@
 #include <QDebug>
 #include "abstractbuffer.h"
 #include "request.h"
+#include "response.h"
 
 
 class RequestDispatcherThread: public QThread
 {
 
 public:
-    RequestDispatcherThread(AbstractBuffer<Request>* request, bool hasDebugLog): requests(request), hasDebugLog(hasDebugLog) {
+    RequestDispatcherThread(AbstractBuffer<Request>* request, AbstractBuffer<Response>* responses, bool hasDebugLog): requests(request), responses(responses), hasDebugLog(hasDebugLog) {
         if (hasDebugLog)
             qDebug() << "Created request dispatcher thread";
         qRegisterMetaType<Request>("Request");
@@ -21,6 +22,7 @@ protected:
 
 private:
     AbstractBuffer<Request>* requests;
+    AbstractBuffer<Response>* responses;
     bool hasDebugLog;
 
 };

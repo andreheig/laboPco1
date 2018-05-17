@@ -66,16 +66,14 @@ FileServer::FileServer(quint16 port, bool debug, QObject *parent) :
                                             QWebSocketServer::NonSecureMode, this)),
     hasDebugLog(debug)
 {
-    // requests = new... TODO
-    // responses = new... TODO
-    // reqDispatcher = new... TODO
-    AbstractBuffer<Request>* requests = new BufferType<Request>();
-    AbstractBuffer<Response>* responses = new BufferType<Response>();
-    RequestDispatcherThread* reqDispatcher = new RequestDispatcherThread(requests, hasDebugLog);
+    requests = new BufferType<Request>();
+    responses = new BufferType<Response>();
+    reqDispatcher = new RequestDispatcherThread(requests, responses, hasDebugLog);
     respDispatcher = new ResponseDispatcherThread(responses, hasDebugLog);
     respDispatcher->start();
     connect(respDispatcher, SIGNAL(responseReady(Response)), this, SLOT(handleResponse(Response)));
-
+    reqDispatcher->start();
+    //connect(reqDispatcher, SIGNAL(requestReady(Request)), this, SLOT(handleResponse(Request)));
     if (websocketServer->listen(QHostAddress::Any, port)) {
         if (hasDebugLog)
             qDebug() << "Fileserver listening on port" << port << "with strategy: one thread per request";
@@ -114,7 +112,9 @@ void FileServer::processTextMessage(QString message)
         qDebug() << "Message received:" << message;
     if (pClient) {
         Request req(message, pClient->origin());
+        cout << "request build" << endl;
         requests->put(req);
+        cout << "request put" << endl;
     }
 }
 
