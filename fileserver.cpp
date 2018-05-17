@@ -112,9 +112,7 @@ void FileServer::processTextMessage(QString message)
         qDebug() << "Message received:" << message;
     if (pClient) {
         Request req(message, pClient->origin());
-        cout << "request build" << endl;
         requests->put(req);
-        cout << "request put" << endl;
     }
 }
 
