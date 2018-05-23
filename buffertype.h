@@ -14,45 +14,51 @@ template<typename T>
  * y mettre des éléments de type quelconque.
  */
 class BufferType : public AbstractBuffer<T>
-// Version Sémaphore tampon simple
-
 {
-
 protected:
-    T element;
-    QSemaphore mutex, waitEmpty, waitFull; enum {Full, Empty} state;
-    unsigned nbWaitingProd, nbWaitingCons;
+    // Container permettant de stoquer nos éléments
+    T *elements;
+    int writePointer, readPointer, nbElements, bufferSize; QSemaphore mutex, waitProd, waitConso;
+    unsigned nbWaitingProd, nbWaitingConso;
 
 public:
-    BufferType(): mutex(1), state(Empty),
-    nbWaitingProd(0),
-    nbWaitingCons(0) {}
+    BufferType(unsigned int size) {
+        mutex.release();
+        if ((elements = new T[size]) != 0) {
+            writePointer = readPointer = nbElements = 0;
+            nbWaitingProd = nbWaitingConso = 0; bufferSize = size;
+            return;
+        }
+        // Exception
+        throw new bad_alloc;
+    }
 
     /**
      * @brief Destructor
      */
-    ~BufferType() {}
+    virtual ~BufferType() {}
 
     /**
      * @brief put
-     * Fonction permettant de stocker un élément T dans notre QList
-     * @param Objet de type Tz que l'on souhaite mettre dans notre collection.
+     * Fonction permettant de stocker un élément T dans notre QList (store)
+     * @param Objet de type T que l'on souhaite ajouter dans notre collection.
      */
     void put(T item){
         mutex.acquire();
-        if (state == Full) {
+        if (nbElements == bufferSize) {
             nbWaitingProd += 1;
             mutex.release();
-            waitEmpty.acquire();
+            waitProd.acquire();
         }
 
-        store.push_front(item);
+        elements[writePointer] = item;
+        writePointer = (writePointer + 1) % bufferSize;
 
-        if (nbWaitingCons > 0) {
-            nbWaitingCons -= 1;
-            waitFull.release();
+        nbElements ++;
+        if (nbWaitingConso > 0) {
+            nbWaitingConso -= 1;
+            waitConso.release();
         } else {
-            state = Full;
             mutex.release();
         }
     }
@@ -66,28 +72,19 @@ public:
 
         T item;
         mutex.acquire();
-        if (state == Empty) {
-            nbWaitingCons += 1;
-            mutex.release();
-            waitFull.acquire();
+        if (nbElements == 0) {
+            nbWaitingConso += 1; mutex.release(); waitConso.acquire();
         }
-
-        item = store.back();
-        store.pop_back();
-
+        item = elements[readPointer]; readPointer = (readPointer + 1) % bufferSize;
+        nbElements --;
         if (nbWaitingProd > 0) {
             nbWaitingProd -= 1;
-            waitEmpty.release(); }
+            waitProd.release(); }
         else {
-            state = Empty;
             mutex.release();
         }
         return item;
     }
-
-private:
-    // Container permettant de stoquer nos éléments
-    QList<T> store;
 };
 
 // Version sémaphore tampon multiple non fonctionnelle
