@@ -32,7 +32,11 @@ QString FileReader::readAll()
         return "read failure";
     QTextStream in(&file);
 
+<<<<<<< HEAD
     // this->simulateHeavyEncoding();
+=======
+    //this->simulateHeavyEncoding();
+>>>>>>> a0baf63e6b559b5c233bb6a0fc003361b2034294
     return in.readAll();
 }
 
