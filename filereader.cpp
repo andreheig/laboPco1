@@ -11,7 +11,6 @@ FileReader::FileReader(const QString path, bool debug): debug(debug) {
     info = QFileInfo(expandedPath);
 }
 
-
 bool FileReader::fileExists()
 {
     return info.exists();
@@ -32,11 +31,7 @@ QString FileReader::readAll()
         return "read failure";
     QTextStream in(&file);
 
-<<<<<<< HEAD
     // this->simulateHeavyEncoding();
-=======
-    //this->simulateHeavyEncoding();
->>>>>>> a0baf63e6b559b5c233bb6a0fc003361b2034294
     return in.readAll();
 }
 
@@ -45,4 +40,3 @@ void FileReader::simulateHeavyEncoding() {
     while(i < 1000000000)
         i++;
 }
-
