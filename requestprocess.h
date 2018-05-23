@@ -5,14 +5,18 @@
 #include "response.h"
 #include "requesthandler.h"
 #include "abstractbuffer.h"
+#include "runnable.h"
 
-class RequestProcess : public QThread
+class RequestProcess : public Runnable
 {
 public:
     RequestProcess(Request request, AbstractBuffer<Response>* responses, bool hasDebug): request(request), responses(responses), hasDebug(hasDebug),
     reqHandler(request, hasDebug)
     {}
     ~RequestProcess(){}
+    QString id(){
+
+    }
 protected:
     void run();
 
