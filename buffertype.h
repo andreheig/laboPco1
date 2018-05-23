@@ -31,6 +31,10 @@ public:
 
     }
 
+    bool tryPut(T item){
+
+    }
+
 private:
     QList<T> store;
     QSemaphore waitEmpty;
