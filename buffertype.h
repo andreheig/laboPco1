@@ -29,6 +29,11 @@ public:
     nbWaitingCons(0) {}
 
     /**
+     * @brief Destructor
+     */
+    ~BufferType() {}
+
+    /**
      * @brief put
      * Fonction permettant de stocker un élément T dans notre QList
      * @param Objet de type Tz que l'on souhaite mettre dans notre collection.
