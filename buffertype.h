@@ -17,45 +17,72 @@ class BufferType : public AbstractBuffer<T>
 // Version Sémaphore tampon simple
 
 {
+
+protected:
+    T element;
+    QSemaphore mutex, waitEmpty, waitFull; enum {Full, Empty} state;
+    unsigned nbWaitingProd, nbWaitingCons;
+
 public:
-    BufferType(): waitEmpty(10), waitFull(0){}
+    BufferType(): mutex(1), state(Empty),
+    nbWaitingProd(0),
+    nbWaitingCons(0) {}
 
     /**
      * @brief put
-     * Fonction permettant de ranger un étément T dans notre QList
-     * @param item
-     * Objet que l'on souhaite mettre dans notre collection.
+     * Fonction permettant de stocker un élément T dans notre QList
+     * @param Objet de type Tz que l'on souhaite mettre dans notre collection.
      */
     void put(T item){
-        //waitEmpty.acquire();
-        //store.push_back(item);
+        mutex.acquire();
+        if (state == Full) {
+            nbWaitingProd += 1;
+            mutex.release();
+            waitEmpty.acquire();
+        }
+
         store.push_front(item);
-        waitFull.release();
+
+        if (nbWaitingCons > 0) {
+            nbWaitingCons -= 1;
+            waitFull.release();
+        } else {
+            state = Full;
+            mutex.release();
+        }
     }
 
     /**
      * @brief get
-     * Fonction permettant de récupérer le premier élément arrivé
-     * @return
-     * Retourne le dernier élément T (celui qui attend depuis longtemps)
+     * Fonction permettant de récupérer le premier élément arrivé de type T
+     * @return le dernier élément T (celui qui attend depuis longtemps)
      */
     T get(){
-        waitFull.acquire();
-            T tmp = store.back();
-            store.pop_back();
-            //waitEmpty.release();
-            return tmp;
+
+        T item;
+        mutex.acquire();
+        if (state == Empty) {
+            nbWaitingCons += 1;
+            mutex.release();
+            waitFull.acquire();
+        }
+
+        item = store.back();
+        store.pop_back();
+
+        if (nbWaitingProd > 0) {
+            nbWaitingProd -= 1;
+            waitEmpty.release(); }
+        else {
+            state = Empty;
+            mutex.release();
+        }
+        return item;
     }
 
 private:
     // Container permettant de stoquer nos éléments
     QList<T> store;
-
-    // Sémaphore permettant de savoir que la liste est vide
-    QSemaphore waitEmpty;
-
-    // Sémaphore afin de savoir si notre container ontient des objets
-    QSemaphore waitFull;
 };
 
 // Version sémaphore tampon multiple non fonctionnelle
