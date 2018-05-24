@@ -5,6 +5,6 @@ using namespace std;
 
 void RequestProcess::run()
 {
-    responses->put(reqHandler.handle());
+    responses->put(reqHandler.getResponse());
     exit(EXIT_SUCCESS);
 }

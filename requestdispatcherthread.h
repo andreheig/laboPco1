@@ -17,7 +17,7 @@ public:
         if (hasDebugLog)
             qDebug() << "Created request dispatcher thread";
         qRegisterMetaType<Request>("Request");
-        pool = new ThreadPool(MAXTHREADPOOL)
+        pool = new ThreadPool(MAXTHREADPOOL);
     }
 
 protected:

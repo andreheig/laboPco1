@@ -28,7 +28,8 @@ HEADERS += \
     buffertype.h \
     requestprocess.h \
     threadpool.h \
-    runnable.h
+    runnable.h \
+    workerthread.h
 
 EXAMPLE_FILES += fileclient.html
 

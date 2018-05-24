@@ -58,6 +58,8 @@
 #include "request.h"
 #include "buffertype.h"
 
+#define MAXBUFFER 50
+
 using namespace std;
 
 FileServer::FileServer(quint16 port, bool debug, QObject *parent) :
@@ -66,8 +68,8 @@ FileServer::FileServer(quint16 port, bool debug, QObject *parent) :
                                             QWebSocketServer::NonSecureMode, this)),
     hasDebugLog(debug)
 {
-    requests = new BufferType<Request>();
-    responses = new BufferType<Response>();
+    requests = new BufferType<Request>(MAXBUFFER);
+    responses = new BufferType<Response>(MAXBUFFER);
     reqDispatcher = new RequestDispatcherThread(requests, responses, hasDebugLog);
     respDispatcher = new ResponseDispatcherThread(responses, hasDebugLog);
     respDispatcher->start();

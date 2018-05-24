@@ -9,6 +9,7 @@ void RequestDispatcherThread::run()
         Request req = requests->get();   // block until a request is available
         if (hasDebugLog)
             qDebug() << "Got a request '" << req.getFilePath();
-
+        RequestHandler* task = new RequestHandler(req, hasDebugLog);
+        pool->start(task);
     }
 }

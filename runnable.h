@@ -1,6 +1,8 @@
 #ifndef RUNNABLE_H
 #define RUNNABLE_H
 
+#include <QString>
+
 class Runnable {
 
 public:

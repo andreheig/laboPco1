@@ -6,12 +6,14 @@
 #include <QList>
 
 #include "runnable.h"
+#include "workerthread.h"
 
 class ThreadPool
 {
 public:
     ThreadPool(int maxThreadCount): poolSize(maxThreadCount){
         currentSize = runnerWorking = runnerWaiting = 0;
+        mutex.release();
     }
 
     ~ThreadPool(){
@@ -24,14 +26,29 @@ public:
      * place dans la piscine, on
      */
     void start(Runnable* runnable){
-        if(currentSize < poolSize){
-
+        mutex.acquire();
+        WorkerThread* pointer = nullptr;
+        if(currentSize == 0){
+            waiting.append(new WorkerThread);
+            currentSize++;
+            //runnerWaiting++;
         }
-        runnable->start;
+
+        if(waiting.size() == 0 && currentSize < poolSize){
+            waiting.append(new WorkerThread);
+            currentSize++;
+        }
+
+        if(waiting.size() >0){
+            pointer = waiting.back();
+            pointer->setTask(runnable);
+            //runnerWaiting--;
+            working.push_back(pointer);
+            //runnerWorking++;
+        }
+        mutex.release();
     }
 
-protected:
-    void run();
 
 private:
     // Permet de savoir combien de worker existe, et ce qu'ils font
@@ -41,9 +58,9 @@ private:
     unsigned int runnerWaiting;
 
     // Permet de garder une trace de leur états
-    QList<Runnable> pool;
-    QList<Runnable> working;
-    QList<Runnable> waiting;
+    //QList<QThread*> pool;
+    QList<WorkerThread*> working;
+    QList<WorkerThread*> waiting;
 
     // Permet d'avoir de l'exclusion mutuel
     QSemaphore mutex;
