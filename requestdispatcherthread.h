@@ -20,6 +20,7 @@ public:
         pool = new ThreadPool(MAXTHREADPOOL);
     }
 
+    ~RequestDispatcherThread(){}
 protected:
     void run();
 

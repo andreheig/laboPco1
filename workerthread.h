@@ -4,9 +4,9 @@
 #include <QThread>
 #include "runnable.h"
 
-class WorkerThread : QThread
+class WorkerThread : public QThread
 {
-    Q_OBJECT
+    //Q_OBJECT
 
 private:
     Runnable* task;
