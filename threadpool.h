@@ -42,7 +42,7 @@ public:
             pointer = waiting.back();
             pointer->setTask(runnable);
             working.push_back(pointer);
-            //connect(pointer, SIGNAL(&QThread::finished),this, SLOT(update()));
+            connect(pointer, SIGNAL(&QThread::finished),this, SLOT(update()));
         }
         mutex.release();
     }
