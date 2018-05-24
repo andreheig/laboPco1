@@ -6,6 +6,8 @@
 
 class WorkerThread : QThread
 {
+    Q_OBJECT
+
 private:
     Runnable* task;
 public:

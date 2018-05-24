@@ -1,6 +1,10 @@
 #include <QDebug>
+#include <iostream>
+
 #include "requesthandler.h"
 #include "filereader.h"
+
+using namespace std;
 
 void RequestHandler::handle()
 {
@@ -12,4 +16,5 @@ void RequestHandler::handle()
     } else {
         response = Response(request, "File not found!");
     }
+    cout << "response: " << response.getResponse().toStdString() << endl;
 }
