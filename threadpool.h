@@ -26,25 +26,38 @@ public:
      * place dans la piscine, on
      */
     void start(Runnable* runnable){
-        mutex.acquire();
-        WorkerThread* pointer = nullptr;
-        if(currentSize == 0){
-            waiting.append(new WorkerThread);
-            currentSize++;
-        }
+        //while(true){
+            mutex.acquire();
+            WorkerThread* pointer = nullptr;
+            if(currentSize == 0){
+                waiting.append(new WorkerThread);
+                currentSize++;
+            }
 
-        if(waiting.size() == 0 && currentSize < poolSize){
-            waiting.append(new WorkerThread);
-            currentSize++;
-        }
+            if(waiting.size() == 0 && currentSize < poolSize){
+                waiting.append(new WorkerThread);
+                currentSize++;
+            }
 
-        if(waiting.size() >0){
-            pointer = waiting.back();
-            pointer->setTask(runnable);
-            working.push_back(pointer);
-            connect(pointer, SIGNAL(&QThread::finished),this, SLOT(update()));
-        }
-        mutex.release();
+            if(waiting.size() >0){
+                pointer = waiting.back();
+                waiting.pop_back();
+                pointer->setTask(runnable);
+                working.push_back(pointer);
+                pointer->run();
+            }
+            for(int i = 0; i < working.size(); ++i){
+                if(working.at(i)->isFinished()){
+                    pointer = working.at(i);
+                    finish.push_back(pointer);
+                }
+            }
+            mutex.release();
+        //}
+    }
+
+    bool workerEnd(){
+        return (finish.size());
     }
 
 

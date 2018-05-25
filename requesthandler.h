@@ -11,12 +11,16 @@ private:
     bool hasDebugLog;
     Response response;
 
+signals:
+    void requestDone();
+
 public:
     ~RequestHandler(){
 
     }
     void run(){
         handle();
+        //emit requestDone();
     }
 
     QString id(){

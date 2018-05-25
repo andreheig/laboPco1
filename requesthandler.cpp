@@ -16,5 +16,5 @@ void RequestHandler::handle()
     } else {
         response = Response(request, "File not found!");
     }
-    cout << "response: " << response.getResponse().toStdString() << endl;
+    //cout << "response: " << response.getResponse().toStdString() << endl;
 }

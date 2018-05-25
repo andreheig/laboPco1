@@ -2,7 +2,12 @@
 #define WORKERTHREAD_H
 
 #include <QThread>
+#include <QObject>
+#include <iostream>
+
 #include "runnable.h"
+
+using namespace std;
 
 class WorkerThread : public QThread
 {
@@ -10,6 +15,10 @@ class WorkerThread : public QThread
 
 private:
     Runnable* task;
+
+signals:
+    void taskDone();
+
 public:
     WorkerThread(){}
 
@@ -19,11 +28,14 @@ public:
 
     void setTask(Runnable* task){
         this->task = task;
+
         this->run();
     }
 
     void run(){
+        cout << "launching job" << endl;
         task->run();
+        //emit taskDone();
     }
 
     QString id(){

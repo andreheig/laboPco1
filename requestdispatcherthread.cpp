@@ -11,5 +11,8 @@ void RequestDispatcherThread::run()
             qDebug() << "Got a request '" << req.getFilePath();
         RequestHandler* task = new RequestHandler(req, hasDebugLog);
         pool->start(task);
+        if(pool->workerEnd()){
+            responses->put(task->getResponse());
+        }
     }
 }
