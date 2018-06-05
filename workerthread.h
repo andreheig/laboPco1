@@ -16,9 +16,6 @@ class WorkerThread : public QThread
 private:
     Runnable* task;
 
-signals:
-    void taskDone();
-
 public:
     WorkerThread(){}
 
@@ -35,7 +32,6 @@ public:
     void run(){
         cout << "launching job" << endl;
         task->run();
-        //emit taskDone();
     }
 
     QString id(){

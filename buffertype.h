@@ -4,6 +4,8 @@
 #include <iostream>
 #include <QList>
 #include <QSemaphore>
+#include <QMutex>
+#include <QWaitCondition>
 
 using namespace std;
 
@@ -86,10 +88,10 @@ private:
 };*/
 
 // Version sémaphore tampon multiple non fonctionnelle
-
+/*
 {
 public:
-    BufferType(unsigned int size): mutex(1), waitNotFull(size){
+    BufferType(unsigned int size): mutex(1), waitNotFull(size), waitNotEmpty(0){
         elements = new T[size];
         if(elements != 0){
             writePointer = readPointer = currentSize = 0;
@@ -103,8 +105,8 @@ public:
 
     void put(T item){
 
-        waitNotFull.acquire();
         mutex.acquire();
+        waitNotFull.acquire();
         elements[writePointer] = item;
         currentSize++;
         writePointer = (writePointer + 1) % bufferSize;
@@ -115,8 +117,8 @@ public:
 
     T get(){
             T item;
-            waitNotEmpty.acquire();
             mutex.acquire();
+            waitNotEmpty.acquire();
             item = elements[readPointer];
             currentSize--;
             readPointer = (readPointer + 1) % bufferSize;
@@ -145,6 +147,64 @@ private:
     QSemaphore waitNotEmpty;
     QSemaphore waitNotFull;
     QSemaphore mutex;
+};*/
+
+{
+public:
+    BufferType(unsigned int size): bufferSize(size) {
+        elements = new T[size];
+        nbElements = readPointer = writePointer = 0;
+    }
+
+    ~BufferType(){}
+
+    void put(T item) {
+       mutex.lock();
+        while(nbElements == bufferSize){
+            isFree.wait(&mutex);        //si le tampon est plein on attend et libère le mutex
+        }
+        nbElements = nbElements + 1; //change la condition
+        elements[writePointer] = item;
+        writePointer = (writePointer + 1) % bufferSize;
+        isFull.wakeOne();
+
+       mutex.unlock();
+    }
+
+    T get(void) {
+        T item; //element à retourner
+        mutex.lock();
+
+        if(nbElements == 0) isFull.wait(&mutex); //si le tampon est vide on attend et on libère le mutex
+
+        item = elements[readPointer];
+        nbElements = nbElements - 1; //change la condition
+        readPointer = (readPointer + 1) % bufferSize;
+
+        mutex.unlock();   //libère le verrou avant de faire un wakeOne
+        isFree.wakeOne(); //on libère une place dans le tampon
+
+        return item;
+    }
+
+    bool tryPut(T item){
+        if(nbElements == bufferSize){
+            return false;
+        }
+        else{
+            put(item);
+            return true;
+        }
+    }
+
+private:
+    T* elements;
+    unsigned int bufferSize;
+    unsigned int readPointer;
+    unsigned int writePointer;
+    unsigned int nbElements;
+    QWaitCondition isFree, isFull;
+    QMutex mutex;
 };
 
 

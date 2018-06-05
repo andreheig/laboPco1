@@ -114,7 +114,7 @@ void FileServer::processTextMessage(QString message)
         qDebug() << "Message received:" << message;
     if (pClient) {
         Request req(message, pClient->origin());
-        requests->put(req);
+        requests->tryPut(req);
     }
 }
 

@@ -29,7 +29,8 @@ HEADERS += \
     requestprocess.h \
     threadpool.h \
     runnable.h \
-    workerthread.h
+    workerthread.h \
+    threadpoolmanager.h
 
 EXAMPLE_FILES += fileclient.html
 

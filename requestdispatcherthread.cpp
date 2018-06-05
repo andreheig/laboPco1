@@ -10,8 +10,10 @@ void RequestDispatcherThread::run()
         if (hasDebugLog)
             qDebug() << "Got a request '" << req.getFilePath();
         RequestHandler* task = new RequestHandler(req, hasDebugLog);
-        pool->start(task);
-        if(pool->workerEnd()){
+        poolManager.start(task);
+        if(poolManager.workerEnd()){
+            if (hasDebugLog)
+                qDebug() << "WorkerThread Finish " ;
             responses->put(task->getResponse());
         }
     }

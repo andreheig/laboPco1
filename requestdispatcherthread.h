@@ -5,7 +5,7 @@
 #include "abstractbuffer.h"
 #include "request.h"
 #include "response.h"
-#include "threadpool.h"
+#include "threadpoolmanager.h"
 
 #define MAXTHREADPOOL 50
 
@@ -17,7 +17,7 @@ public:
         if (hasDebugLog)
             qDebug() << "Created request dispatcher thread";
         qRegisterMetaType<Request>("Request");
-        pool = new ThreadPool(MAXTHREADPOOL);
+        poolManager = ThreadPoolManager(MAXTHREADPOOL);
     }
 
     ~RequestDispatcherThread(){}
@@ -28,7 +28,7 @@ private:
     AbstractBuffer<Request>* requests;
     AbstractBuffer<Response>* responses;
     bool hasDebugLog;
-    ThreadPool* pool;
+    ThreadPoolManager poolManager;
 
 };
 
