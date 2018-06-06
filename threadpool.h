@@ -19,7 +19,7 @@ public:
         currentSize = taskSize = 0;
         working = QList<WorkerThread*>();
         waiting = QList<WorkerThread*>();
-        finish = QList<WorkerThread*>();
+        finish = QList<QString>();
         runnables = QList<Runnable*>();
     }
 
@@ -40,16 +40,17 @@ protected:
 
             // Permet de cheker s'il y a un Thread qui a fini
             for(int i = 0; i < working.size(); ++i){
-                //cout << "test fin Thread" << endl;
-                if(working.at(i)->isFinished()){
+                if(working.at(i)->haveFinish()){
                     pointer = working.at(i);
-                    finish.push_back(pointer);
+                    working.removeAt(i);
+                    finish.push_back(pointer->id());
+                    waiting.push_back(pointer);
                 }
+                pointer = nullptr;
             }
 
             // Cas ou la piscine est vide => 1er Thread créé
             if(currentSize == 0){
-                //cout << "1er Thread cree" << endl;
                 waiting.append(new WorkerThread);
                 currentSize++;
             }
@@ -66,13 +67,12 @@ protected:
             }
 
             // Permet de donner du travail à un Thread
-            if(waiting.size() >0){
+            if(waiting.size() >0 && runnables.size() > 0){
                 pointer = waiting.back();
                 waiting.pop_back();
                 while(taskSize == 0){
                     isTask.wait(&mutex);
                 }
-                //cout << runnables.size() << endl;
                 pointer->setTask(runnables.back());
                 runnables.pop_back();
                 working.push_back(pointer);
@@ -94,7 +94,6 @@ public:
 
     bool workerEnd(){
         mutex.lock();
-        cout << finish.size() << endl;
         bool ret = !finish.isEmpty();
         isEmpty.notify_all();
         mutex.unlock();
@@ -109,10 +108,10 @@ private:
     unsigned int taskSize;
 
     // Permet de garder une trace de leur états
-    //QList<QThread*> pool;
     QList<WorkerThread*> working;
     QList<WorkerThread*> waiting;
-    QList<WorkerThread*> finish;
+public:
+    QList<QString> finish;
 
     // Permet d'avoir de l'exclusion mutuel
     QMutex mutex;

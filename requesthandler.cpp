@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <iostream>
+#include <string>
 
 #include "requesthandler.h"
 #include "filereader.h"
@@ -16,5 +17,9 @@ void RequestHandler::handle()
     } else {
         response = Response(request, "File not found!");
     }
-    //cout << "response: " << response.getResponse().toStdString() << endl;
+    responses->put(response);
+    /*reponseOK.release();
+    string test = response.getResponse().toStdString().substr(0,30);
+    cout << "id: " << QString::number(identite).toStdString() << endl;
+    cout << "response: " << test << endl;*/
 }

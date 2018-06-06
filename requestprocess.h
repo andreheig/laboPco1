@@ -6,6 +6,7 @@
 #include "requesthandler.h"
 #include "abstractbuffer.h"
 
+
 /**
  * @brief The RequestProcess class
  * Classe permettant de traiter une requête et de fournir la réponse approprié
@@ -14,7 +15,7 @@ class RequestProcess : public QThread
 {
 public:
     RequestProcess(Request request, AbstractBuffer<Response>* responses, bool hasDebug): request(request), responses(responses), hasDebug(hasDebug),
-    reqHandler(request, hasDebug)
+    reqHandler(request, hasDebug, 0, responses)
     {}
     ~RequestProcess(){}
 protected:

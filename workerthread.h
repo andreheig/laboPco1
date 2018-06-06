@@ -15,6 +15,7 @@ class WorkerThread : public QThread
 
 private:
     Runnable* task;
+    bool finished = false;
 
 public:
     WorkerThread(){}
@@ -24,19 +25,24 @@ public:
     }
 
     void setTask(Runnable* task){
+        finished = false;
         this->task = task;
-
-        this->run();
+        //this->run();
     }
 
     void run(){
-        cout << "launching job" << endl;
+        //cout << "launching job" << endl;
         task->run();
+        finished = true;
     }
 
     QString id(){
-        return "hello";
+        return task->id();
 
+    }
+
+    bool haveFinish(){
+        return finished;
     }
 
 };

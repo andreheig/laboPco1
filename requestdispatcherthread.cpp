@@ -9,12 +9,25 @@ void RequestDispatcherThread::run()
         Request req = requests->get();   // block until a request is available
         if (hasDebugLog)
             qDebug() << "Got a request '" << req.getFilePath();
-        RequestHandler* task = new RequestHandler(req, hasDebugLog);
+        RequestHandler* task = new RequestHandler(req, hasDebugLog, count, responses);
         poolManager.start(task);
+        handling.push_back(task);
+        count++;
+        /*
         if(poolManager.workerEnd()){
-            if (hasDebugLog)
-                qDebug() << "WorkerThread Finish " ;
-            responses->put(task->getResponse());
-        }
+            QString index = poolManager.getFinishID();
+
+                for (int i = 0; i < handling.size(); ++i){
+                    if (hasDebugLog)
+                        qDebug() << "index: {" << index << "} id handling : (" << handling.at(i)->id() << ")" << endl;
+                    if (index == handling.at(i)->id()){
+                        if (hasDebugLog)
+                            qDebug() << "tache finie trouve  " ;
+                        responses->put(handling.at(i)->getResponse());
+                        handling.removeAt(i);
+                    }
+                }
+
+        }*/
     }
 }

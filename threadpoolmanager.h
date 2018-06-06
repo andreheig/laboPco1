@@ -1,7 +1,11 @@
 #ifndef THREADPOOLMANAGER_H
 #define THREADPOOLMANAGER_H
 
+#include <iostream>
+
 #include "threadpool.h"
+
+using namespace std;
 
 class ThreadPoolManager{
 public:
@@ -18,6 +22,19 @@ public:
 
     bool workerEnd(){
         return pool->workerEnd();
+    }
+
+    QString getFinishID(){
+        cout << "finish ID" << endl;
+        if (!pool->finish.isEmpty()){
+            cout << "finish contient au moins un element" << endl;
+            QString ret = pool->finish.front();
+            cout << "numero fini: [" << ret.toStdString() << "]" << endl;
+            pool->finish.pop_front();
+            return ret;
+        }
+        else
+            return "";
     }
 
 private:
